@@ -137,12 +137,16 @@ function check_each_neighbors(obj){
 }
 
 
-function draw_path(current_node){   
-    if(current_node == start_node){
-        return
-    }
-    color_node(current_node, 'yellow')
-    draw_path(current_node.parent)
+function draw_path(current_node){  
+    setTimeout(() => {
+        console.log("its runnign")
+        if(current_node == start_node){
+            return
+        }
+        color_node(current_node, 'yellow')
+        draw_path(current_node.parent)
+    }, 20); 
+    
 
 }
 
