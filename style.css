@@ -8,22 +8,153 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: rgb(68, 67, 67);
+  overflow: scroll;
+  font-family: "Poppins", sans-serif;
+}
+
+nav {
+  background-color: rgb(31, 63, 94);
+  width: 100vw;
+  margin-bottom: 20px;
+  color: white;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 5px;
 }
 
 .canvas {
-  margin-top: 10vh;
 }
 
 .visualize {
   width: 150px;
   height: 50px;
-  font-size: 30px;
   color: white;
-  background-color: rgb(26, 188, 156);
+  font-weight: 500;
+  font-size: 20px;
+  background-color: rgb(12, 211, 101);
   border: none;
-  margin-top: 20px;
   outline: none;
   cursor: pointer;
   border-radius: 12px;
+}
+
+.visualize:hover {
+  background-color: rgb(35, 218, 218);
+  box-shadow: 1px 1px 1px 30px solid black;
+}
+
+.reset_path,
+.reset_everything {
+  cursor: pointer;
+}
+
+footer {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 100vw;
+  margin-top: 20px;
+}
+
+.start_node::before {
+  content: "->";
+  padding: 0px 5px;
+  font-size: 20px;
+  font-weight: 800;
+  width: 25px;
+  height: 25px;
+  margin-right: 15px;
+  background-color: white;
+  border: 1px solid rgb(63, 195, 212);
+}
+
+.target_node {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+.target_node::before {
+  content: "";
+  display: block;
+  width: 25px;
+  height: 25px;
+  border-radius: 100%;
+  margin-right: 15px;
+  border: 2px solid black;
+}
+
+.target_node::after {
+  content: "";
+  display: block;
+  position: absolute;
+  left: 7.5px;
+  top: 7.5px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 15px;
+  border: 2px solid black;
+  background-color: red;
+}
+
+.shortest_path {
+  display: flex;
+  align-items: center;
+}
+.shortest_path::before {
+  content: "";
+  display: block;
+  width: 25px;
+  height: 25px;
+  margin-right: 15px;
+  border: 2px solid rgb(63, 195, 212);
+  background-color: yellow;
+}
+
+.wall_node {
+  display: flex;
+  align-items: center;
+}
+.wall_node::before {
+  content: "";
+  display: block;
+  width: 25px;
+  height: 25px;
+  margin-right: 15px;
+  border: 2px solid rgb(63, 195, 212);
+  background-color: black;
+}
+
+.unvisited_node {
+  display: flex;
+  align-items: center;
+}
+
+.unvisited_node::before {
+  content: "";
+  display: block;
+  width: 25px;
+  height: 25px;
+  margin-right: 15px;
+  border: 2px solid rgb(63, 195, 212);
+  background-color: white;
+}
+
+@media only screen and (max-width: 600px) {
+  nav {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .footelement {
+    margin: 10px;
+  }
+
+  footer {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    text-align: left;
+  }
 }

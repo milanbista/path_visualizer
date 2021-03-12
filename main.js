@@ -2,13 +2,14 @@ const canvas = document.querySelector('canvas')
 const visualize = document.querySelector('.visualize')
 const resetPath = document.querySelector(".reset_path")
 const resetGrid = document.querySelector(".reset_everything")
+
+canvas.width = 1440 
 canvas.height = 600
-canvas.width = 600
+const ROWS = 25 
+const COLUMNS = 60
 canvas.style.border='1px solid black'
 const c = canvas.getContext('2d')
 
-const row= 30
-const col = 30
 var boxes =[]
 var open_list = []
 var closed_list = new Set()
@@ -25,43 +26,57 @@ class Box {
         this.isBarrier = false       
     }
 }
+    
 
 function create_grid(){
-    for (let i = 0; i< row; i++){
+    console.log("grid called")
+    for (var i = 0; i<ROWS; i++){
         boxes[i] = []
-        for(let j =0; j< col; j++){
-            boxes[i][j] = new Box(i*canvas.height/row, j*canvas.width/col)
+        for(var j=0; j<COLUMNS; j++){
+            boxes[i][j] = new Box( j*(canvas.width/COLUMNS),i*(canvas.height/ROWS))
             c.beginPath()
-            c.rect(i*canvas.height/row, j*canvas.width/col, 20,20)
-            c.strokeStyle ="rgb(174,177,181)"
+            c.rect(j*(canvas.height/ROWS), i*(canvas.width/COLUMNS),25,25)
+            c.strokeStyle ="rgb(14,177,181, 0.6)"
             c.fillStyle="white"
             c.fill()
-            c.stroke()
+            c.stroke()      
 
         }
     }
 }
 
+function color_node(item, color){
+
+    if(!(item.isStart || item.isEnd)){
+    c.beginPath()
+    c.rect(item.x_position, item.y_position, 25,25)
+    c.strokeStyle ="rgb(14,177,181, 0.6)"
+    c.fillStyle = color
+    c.fill()
+    c.stroke()
+    }
+}
+
 
 function get_neighbors(){
-    for (let i = 0; i< row; i++){
-        for(let j =0; j< col; j++){
+    for (let i = 0; i< ROWS; i++){
+        for(let j =0; j< COLUMNS; j++){
             //check up
             if((i > 0 )&& (!boxes[i-1][j].isBarrier)){
                 boxes[i][j].neighbors.push(boxes[i-1][j])
             }
 
-            //check bottom
-            if((i < (row-1) )&& (!boxes[i+1][j].isBarrier)){
-                boxes[i][j].neighbors.push(boxes[i+1][j])
-            }
-
-            //check right
-
-            if((j < (col-1)) && (!boxes[i][j+1].isBarrier )){
+             //check right
+             if((j < (COLUMNS-1)) && (!boxes[i][j+1].isBarrier )){
                 boxes[i][j].neighbors.push(boxes[i][j+1])
 
             }
+
+            //check bottom
+            if((i < (ROWS-1) )&& (!boxes[i+1][j].isBarrier)){
+                boxes[i][j].neighbors.push(boxes[i+1][j])
+            }
+
             //check left
             if(j > 0 && !boxes[i][j-1].isBarrier){
                 boxes[i][j].neighbors.push(boxes[i][j-1])
@@ -73,23 +88,24 @@ function get_neighbors(){
 }
 
 
-  start_animation = ()=>{
+
+start_animation = ()=>{
 
     var interval = setInterval( async() => {
     if(open_list.length > 0){
         let item = open_list[0]
         closed_list.add(item)
         const a = await open_list.shift()
-        check_each_neighbors(item)
+         check_each_neighbors(item)
             
         if(item == end_node){
             console.log("Found The Target!! ")
             //sending end_node.parent so 
             //yellow path doesnot overwrite the end node
-            draw_path(end_node.parent)
+             draw_path(end_node.parent)
             clearInterval(interval)
         }  
-        color_box(item)
+        color_node(item, 'rgb(35, 218, 218)')
         
     }
     else{
@@ -103,20 +119,6 @@ function get_neighbors(){
 }
 
 
-function draw_path(current_node){   
-    if(current_node == start_node){
-        return
-    }
-    color_node(current_node, 'yellow')
-    draw_path(current_node.parent)
-
-}
-
-
-
-
-// this function is to check the neighbors of 
-// open list node its expanding 
 function check_each_neighbors(obj){
     for(let i =0; i< obj.neighbors.length; i++){
         if(!closed_list.has(obj.neighbors[i])){ 
@@ -135,30 +137,22 @@ function check_each_neighbors(obj){
 }
 
 
-function color_box(item){
-    if(item.isStart == false && item.isEnd == false){
-    c.beginPath()
-    c.rect(item.x_position, item.y_position, 20,20)
-    c.fillStyle='rgb(64,206,227)'
-    c.fill()
-    c.stroke() 
+function draw_path(current_node){   
+    if(current_node == start_node){
+        return
     }
+    color_node(current_node, 'yellow')
+    draw_path(current_node.parent)
+
 }
 
-function color_node(item, color){
-    c.beginPath()
-    c.rect(item.x_position, item.y_position, 20,20)
-    c.fillStyle=color
-    c.fill()
-    c.stroke() 
-}
 
 
 function reset_grids_path(){
     open_list =[]
     closed_list.clear()
-    for ( var i = 0; i< row; i++){
-        for (var j=0; j< col; j++){
+    for ( var i = 0; i< ROWS; i++){
+        for (var j=0; j< COLUMNS; j++){
             if((!boxes[i][j].isBarrier) && (!boxes[i][j].isStart) && (!boxes[i][j].isEnd)){
                      boxes[i][j].neighbors = []
                      boxes[i][j].parent = null
@@ -171,8 +165,8 @@ function reset_grids_path(){
 function reset_everything(){
     open_list =[]
     closed_list.clear()
-    for ( var i = 0; i< row; i++){
-        for (var j=0; j< col; j++){
+    for ( var i = 0; i< ROWS; i++){
+        for (var j=0; j< COLUMNS; j++){
             if((boxes[i][j].isBarrier) || ((!boxes[i][j].isStart) && (!boxes[i][j].isEnd))){
                 boxes[i][j].isBarrier = false
                 boxes[i][j].neighbors = []
@@ -184,28 +178,65 @@ function reset_everything(){
 }
 
 
-create_grid()
-// get_neighbors()
 
-const start_node = boxes[3][15]
-const end_node = boxes[25][1]
+create_grid()
+
+
+const start_node = boxes[13][10]
+// color_node(start_node, 'green')
 start_node.isStart = true
+c.beginPath()
+c.moveTo(start_node.x_position+2, start_node.y_position+12.5)
+c.lineTo(start_node.x_position+12.5, start_node.y_position+12.5)
+c.strokeStyle='black'
+c.lineWidth=4
+c.stroke()
+c.beginPath()
+c.moveTo(start_node.x_position+12.5, start_node.y_position+3)
+c.lineTo(start_node.x_position+22, start_node.y_position+12.5)
+c.strokeStyle='black'
+c.lineWidth=4
+c.stroke()
+c.beginPath()
+c.moveTo(start_node.x_position+22, start_node.y_position+12.5)
+c.lineTo(start_node.x_position+12.5, start_node.y_position+22)
+c.strokeStyle='black'
+c.lineWidth=4
+c.stroke()
+
+
+
+
+
+
+const end_node = boxes[13][45]
+c.beginPath()
+c.arc(end_node.x_position + 12.5, end_node.y_position+12.5, 10, 0, 2*Math.PI)
+c.fillStyle='white'
+c.strokeStyle = 'black'
+c.lineWidth= 2
+c.fill()
+c.stroke()
+c.beginPath()
+c.arc(end_node.x_position + 12.5, end_node.y_position+12.5, 4, 0, 2*Math.PI)
+c.fillStyle='red'
+c.strokeStyle=''
+c.fill()
+c.stroke()
 end_node.isEnd = true
 
-color_node(start_node, 'red')
-
-color_node(end_node, 'blue')
 
 
 
-canvas.addEventListener('mousedown', (e)=>{
+canvas.addEventListener('mousedown', ()=>{
 
     console.log("mouse down working")
 
     canvas.onmousemove = (e)=>{
         console.log("mouse move working")
-            var block_i = Math.floor(e.offsetX/20)
-            var block_j = Math.floor(e.offsetY/20)
+        console.log(e.offsetX, e.offsetY)
+            var block_j = Math.floor(e.offsetX/24)
+            var block_i = Math.floor(e.offsetY/24)
             console.log(block_i, block_j)
         
             if(!boxes[block_i][block_j].isStart && !boxes[block_i][block_j].isEnd){
@@ -220,19 +251,24 @@ canvas.addEventListener("mouseup", (e)=>{
     canvas.onmousemove = null
 })
 
+
 canvas.addEventListener('click', (e)=>{
 
-    console.log("clicked")
-    var block_i = Math.floor(e.offsetX/20)
-           var block_j = Math.floor(e.offsetY/20)
-            console.log(block_i, block_j)
-        
-            if(!boxes[block_i][block_j].isStart && !boxes[block_i][block_j].isEnd){
+    console.log('offset x, y => ', e.offsetX, e.offsetY)
+    var block_i = Math.floor(e.offsetY/24)
+    var block_j = Math.floor(e.offsetX/24)
+    console.log(block_i, block_j)
+    
 
-            boxes[block_i][block_j].isBarrier = true
-             color_node(boxes[block_i][block_j], 'black')
-            }
+    if(!boxes[block_i][block_j].isStart && !boxes[block_i][block_j].isEnd){
+
+    boxes[block_i][block_j].isBarrier = true
+    color_node(boxes[block_i][block_j], 'black')
+    }
 })
+
+
+
 
 
 visualize.addEventListener('click', async ()=>{
@@ -240,24 +276,10 @@ visualize.addEventListener('click', async ()=>{
     open_list[0] = start_node
     get_neighbors()
     start_animation()
-    console.log('clicked')
 })
+
 
 
 resetPath.addEventListener('click', reset_grids_path)
 
 resetGrid.addEventListener('click', reset_everything)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
